@@ -145,9 +145,9 @@ static int acdtd_val_pwrcl = 0x00006A11;
 static int acdtd_val_perfcl = 0x00006A11;
 static int dvmrc_val = 0x000E0F0F;
 static int acdsscr_val = 0x00000601;
-static int acdcr_val_pwrcl = 0x002D5FFD;
+static int acdcr_val_pwrcl = 0x002C5FFD;
 module_param(acdcr_val_pwrcl, int, 0444);
-static int acdcr_val_perfcl = 0x002D5FFD;
+static int acdcr_val_perfcl = 0x002C5FFD;
 module_param(acdcr_val_perfcl, int, 0444);
 int enable_acd = 1;
 module_param(enable_acd, int, 0444);
@@ -170,6 +170,7 @@ module_param(enable_acd, int, 0444);
 #define READ_L2ACDSSCR(reg) \
 	(reg = get_l2_indirect_reg(L2ACDSSCR_REG))
 
+//Performance cluster
 static struct pll_clk perfcl_pll = {
 	.mode_reg = (void __iomem *)C1_PLL_MODE,
 	.l_reg = (void __iomem *)C1_PLL_L_VAL,
@@ -249,6 +250,7 @@ static struct alpha_pll_clk perfcl_alt_pll = {
 	},
 };
 
+//Power cluster (LITTLE)
 static struct pll_clk pwrcl_pll = {
 	.mode_reg = (void __iomem *)C0_PLL_MODE,
 	.l_reg = (void __iomem *)C0_PLL_L_VAL,
@@ -553,7 +555,13 @@ static enum handoff cpu_clk_8996_handoff(struct clk *c)
 
 static long cpu_clk_8996_round_rate(struct clk *c, unsigned long rate)
 {
-	return clk_round_rate(c->parent, rate);
+	int i;
+
+	for (i = 0; i < c->num_fmax; i++)
+		if (rate <= c->fmax[i])
+			return clk_round_rate(c->parent, c->fmax[i]);
+
+	return clk_round_rate(c->parent, c->fmax[c->num_fmax - 1]);
 }
 
 static unsigned long alt_pll_perfcl_freqs[] = {
@@ -1275,8 +1283,6 @@ static void populate_opp_table(struct platform_device *pdev)
 	    "Failed to add OPP levels for CBF\n");
 }
 
-static int perfclspeedbin;
-
 unsigned long pwrcl_early_boot_rate = 883200000;
 unsigned long perfcl_early_boot_rate = 883200000;
 unsigned long cbf_early_boot_rate = 614400000;
@@ -1286,7 +1292,6 @@ static int cpu_clock_8996_driver_probe(struct platform_device *pdev)
 {
 	int ret, cpu;
 	unsigned long pwrclrate, perfclrate, cbfrate;
-	int pvs_ver = 0;
 	u32 pte_efuse;
 	char perfclspeedbinstr[] = "qcom,perfcl-speedbinXX-vXX";
 	char pwrclspeedbinstr[] = "qcom,pwrcl-speedbinXX-vXX";
@@ -1305,12 +1310,10 @@ static int cpu_clock_8996_driver_probe(struct platform_device *pdev)
 	}
 
 	pte_efuse = readl_relaxed(vbases[EFUSE_BASE]);
-	perfclspeedbin = ((pte_efuse >> EFUSE_SHIFT) & EFUSE_MASK);
-	dev_info(&pdev->dev, "using perf/pwr/cbf speed bin %u and pvs_ver %d\n",
-		 perfclspeedbin, pvs_ver);
+	dev_info(&pdev->dev, "using perf/pwr/cbf speed bin 0 and pvs_ver 0\n");
 
 	snprintf(perfclspeedbinstr, ARRAY_SIZE(perfclspeedbinstr),
-			"qcom,perfcl-speedbin%d-v%d", perfclspeedbin, pvs_ver);
+			"qcom,perfcl-speedbin0-v0");
 
 #ifdef CONFIG_PVS_LEVEL_INTERFACE
 	snprintf(pvs_level, ARRAY_SIZE(pvs_level), "%d-v%d", perfclspeedbin, pvs_ver);
@@ -1318,41 +1321,26 @@ static int cpu_clock_8996_driver_probe(struct platform_device *pdev)
 
 	ret = of_get_fmax_vdd_class(pdev, &perfcl_clk.c, perfclspeedbinstr);
 	if (ret) {
-		dev_err(&pdev->dev, "Can't get speed bin for perfcl. Falling back to zero.\n");
-		ret = of_get_fmax_vdd_class(pdev, &perfcl_clk.c,
-					    "qcom,perfcl-speedbin0-v0");
-		if (ret) {
-			dev_err(&pdev->dev, "Unable to retrieve plan for perf. Bailing...\n");
-			return ret;
-		}
+		dev_err(&pdev->dev, "Unable to retrieve plan for perf. Bailing...\n");
+		return ret;
 	}
 
 	snprintf(pwrclspeedbinstr, ARRAY_SIZE(pwrclspeedbinstr),
-			"qcom,pwrcl-speedbin%d-v%d", perfclspeedbin, pvs_ver);
+			"qcom,pwrcl-speedbin0-v0");
 
 	ret = of_get_fmax_vdd_class(pdev, &pwrcl_clk.c, pwrclspeedbinstr);
 	if (ret) {
-		dev_err(&pdev->dev, "Can't get speed bin for pwrcl. Falling back to zero.\n");
-		ret = of_get_fmax_vdd_class(pdev, &pwrcl_clk.c,
-				    "qcom,pwrcl-speedbin0-v0");
-		if (ret) {
-			dev_err(&pdev->dev, "Unable to retrieve plan for pwrcl\n");
-			return ret;
-		}
+		dev_err(&pdev->dev, "Unable to retrieve plan for pwrcl\n");
+		return ret;
 	}
 
 	snprintf(cbfspeedbinstr, ARRAY_SIZE(cbfspeedbinstr),
-			"qcom,cbf-speedbin%d-v%d", perfclspeedbin, pvs_ver);
+			"qcom,cbf-speedbin0-v0");
 
 	ret = of_get_fmax_vdd_class(pdev, &cbf_clk.c, cbfspeedbinstr);
 	if (ret) {
-		dev_err(&pdev->dev, "Can't get speed bin for cbf. Falling back to zero.\n");
-		ret = of_get_fmax_vdd_class(pdev, &cbf_clk.c,
-				    "qcom,cbf-speedbin0-v0");
-		if (ret) {
-			dev_err(&pdev->dev, "Unable to retrieve plan for cbf\n");
-			return ret;
-		}
+		dev_err(&pdev->dev, "Unable to retrieve plan for cbf\n");
+		return ret;
 	}
 
 	get_online_cpus();
@@ -1822,3 +1810,4 @@ early_initcall(cpu_clock_8996_early_init);
 
 MODULE_DESCRIPTION("CPU clock driver for msm8996");
 MODULE_LICENSE("GPL v2");
+

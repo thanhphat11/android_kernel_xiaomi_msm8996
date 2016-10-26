@@ -43,6 +43,7 @@ static struct ex_governor_data {
 
 static unsigned int tblmap[TABLE_NUM][TABLE_SIZE] __read_mostly = {
 
+<<<<<<< HEAD
 	//table 0
 	{
 		616400,
@@ -98,6 +99,15 @@ static unsigned int tblmap[TABLE_NUM][TABLE_SIZE] __read_mostly = {
 		840000,
 		960000,
 		1248000,
+=======
+	//table 1
+	{
+		652800,
+		729600,
+		844800,
+		960000,
+		1228800,
+>>>>>>> bc4133aec0b62a0aa3b50b9e155b3664f3088356
 		1324800,
 		1478400,
 		1593600,
@@ -105,6 +115,7 @@ static unsigned int tblmap[TABLE_NUM][TABLE_SIZE] __read_mostly = {
 		1593600,
 		1593600,
 		1593600,
+<<<<<<< HEAD
 	},
 
 	//table 4
@@ -137,6 +148,24 @@ static unsigned int tblmap[TABLE_NUM][TABLE_SIZE] __read_mostly = {
 		1708800,
 		1708800,
 		1708800,
+=======
+	},	
+	
+	//table 2
+	{
+		844800,
+		960000,
+		1036800,
+		1113600,
+		1324800,
+		1401600,
+		1632000,
+		1708800,
+		1824000,
+		1996000,
+		2150400,
+		2150400,
+>>>>>>> bc4133aec0b62a0aa3b50b9e155b3664f3088356
 	}
 
 };
