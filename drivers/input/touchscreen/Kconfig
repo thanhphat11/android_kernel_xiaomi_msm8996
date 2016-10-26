@@ -672,6 +672,13 @@ config TOUCHSCREEN_WM9712
 	  Say Y here to enable support for the Wolfson Microelectronics
 	  WM9712 touchscreen controller.
 
+config TOUCHBOOST_CONTROL
+	bool "Touch boost control"
+	depends on INPUT_TOUCHSCREEN
+	help
+	  Boeffla Kernels functionality to control input boost as touch boost
+	  in the Boeffla Config app
+
 config TOUCHSCREEN_WM9713
 	bool "WM9713 Touchscreen interface support"
 	depends on TOUCHSCREEN_WM97XX
