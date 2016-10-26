@@ -297,6 +297,7 @@ CONFIG_SHELL := $(shell if [ -x "$$BASH" ]; then echo $$BASH; \
 
 HOSTCC       = gcc
 HOSTCXX      = g++
+HOSTCFLAGS   = -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer -Werror-implicit-function-declaration \ -std=gnu89 mcpu=cortex-a57.cortex-a53 
 HOSTCFLAGS   = -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer -std=gnu89
 HOSTCXXFLAGS = -O2
 
@@ -404,10 +405,15 @@ KBUILD_CPPFLAGS := -D__KERNEL__
 
 KBUILD_CFLAGS   := -Wall -Wundef -Wstrict-prototypes -Wno-trigraphs \
 		   -fno-strict-aliasing -fno-common \
-		   -Werror-implicit-function-declaration \
 		   -Wno-format-security \
+		   -Wno-implicit-function-declaration \
+		   -Wno-declaration-after-statement \
+		   -Wno-format-extra-args \
+		   -Wno-return-local-addr \
+		   -Wno-discarded-array-qualifiers \
 		   -std=gnu89
-
+		   -mcpu=cortex-a57.cortex-a53 -mtune=cortex-a57.cortex-a53
+		   
 KBUILD_AFLAGS_KERNEL :=
 KBUILD_CFLAGS_KERNEL :=
 KBUILD_AFLAGS   := -D__ASSEMBLY__

@@ -9,6 +9,10 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  */
+ 
+ /*
+ This is the modiified voltage table to make the 2.15/1.8/624 frequencies work on the 32GB variant of the Mi5 32GB
+ */
 
 #include <dt-bindings/interrupt-controller/arm-gic.h>
 
@@ -191,7 +195,7 @@
 	};
 
 	rpm-regulator-ldoa11 {
-		status = "okay";
+			status = "okay";
 		pm8994_l11: regulator-l11 {
 			regulator-min-microvolt = <1150000>;
 			regulator-max-microvolt = <1150000>;
@@ -712,6 +716,10 @@
 					 470000  470000  470000  470000  470000
 					 470000  470000  470000  470000  470000
 					 470000>;
+<<<<<<< HEAD
+=======
+
+>>>>>>> bc4133aec0b62a0aa3b50b9e155b3664f3088356
 
 				qcom,cpr-floor-to-ceiling-max-range =
 					/* Speed bin 0 */
@@ -776,6 +784,7 @@
 					<35000     0 40000  10000     5000>,
 					<35000     0 40000  10000     5000>;
 
+
 				qcom,cpr-closed-loop-voltage-fuse-adjustment =
 					/* Speed bin 0 */
 					<35000 35000 40000  40000   40000>,
@@ -825,11 +834,15 @@
 					 (-26000) (-27000) (-28000) (-30000)>,
 
 					/* Speed bin 1 */
+					
 					<(-15000) (-15000) (-15000) (-15000)
 					 (-13000) (-14000) (-15000) (-18000)
 					 (-20000) (-22000) (-24000) (-25000)
 					 (-26000) (-27000) (-28000) (-30000)>;
+<<<<<<< HEAD
 
+=======
+>>>>>>> bc4133aec0b62a0aa3b50b9e155b3664f3088356
 				qcom,allow-voltage-interpolation;
 				qcom,allow-quotient-interpolation;
 				qcom,cpr-scaled-open-loop-voltage-as-ceiling;
@@ -884,7 +897,10 @@
 					905000  905000  905000  905000  905000
 					905000  905000  905000 1140000 1140000
 				       1140000 1140000 1140000 1140000>;
+<<<<<<< HEAD
 
+=======
+>>>>>>> bc4133aec0b62a0aa3b50b9e155b3664f3088356
 				qcom,cpr-voltage-floor =
 				       /* Speed bin 0 */
 					<625000  625000  625000  625000  625000
@@ -953,7 +969,11 @@
 					470000  470000  470000  470000  470000
 					470000  470000  470000  470000  470000
 					470000  470000  470000  470000>;
+<<<<<<< HEAD
 
+=======
+					
+>>>>>>> bc4133aec0b62a0aa3b50b9e155b3664f3088356
 				qcom,cpr-floor-to-ceiling-max-range =
 					/* Speed bin 0 */
 					<50000   50000   80000   80000   80000
@@ -1106,7 +1126,11 @@
 					905000  905000  905000 1140000 1140000
 				       1140000 1140000 1140000 1140000 1140000
 				       1140000 1140000 1140000 1140000 1140000>;
+<<<<<<< HEAD
 
+=======
+				       
+>>>>>>> bc4133aec0b62a0aa3b50b9e155b3664f3088356
 				qcom,cpr-voltage-floor =
 				       /* Speed bin 0 */
 				       <625000  625000  625000  625000  625000
@@ -1262,7 +1286,7 @@
 					<35000     0 30000   15000  15000>,
 					<35000     0 30000   15000  15000>,
 					<35000     0 30000   15000  15000>;
-
+					
 				qcom,cpr-closed-loop-voltage-fuse-adjustment =
 					/* Speed bin 0 */
 					<35000 35000 40000 (-30000) 40000>,
